@@ -1,0 +1,2 @@
+RESOLUTION = (640, 320)
+FPS = 60
