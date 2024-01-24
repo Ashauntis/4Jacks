@@ -1,5 +1,5 @@
 import pygame
-from classes.scene import Scene
+from scene import Scene
 
 class Title(Scene):
     def __init__(self, game):
@@ -20,7 +20,7 @@ class Title(Scene):
 
     def update(self):
         if pygame.K_SPACE in self.game.just_pressed:
-            self.next = "GameBoard"
+            self.game.scene_replace = "GameBoard"
 
     def draw(self):
         self.screen.blit(self.background, (0, 0))
