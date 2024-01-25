@@ -122,29 +122,29 @@ class Game:
 
     def make_text(self, text, color, fontSize, font=None):
         return pygame.font.Font(font, fontSize).render(text, 1, color)
+    
+    def make_transparent_surface(self, size):
+        return pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
 
-    def place_text_absolute(self, text, target, position):
-        target.blit(text, position)
-
-    def place_text_centered(self, text, target, position):
+    def blit_centered(self, surface, target, position=(.5, .5)):
         """
-        This function places a given text at a specified position on the target surface.
+        This function places a given surface at a specified position on the target surface.
 
         Parameters:
-        text (pygame.Surface): The text to be placed. This is a pygame Surface object, which can be
+        Surface (pygame.Surface): The surface to be placed. This is a pygame Surface object, which can be
         created using pygame.font.Font.render() method.
 
-        target (pygame.Surface): The target surface on which the text is to be placed. This could be
+        target (pygame.Surface): The target surface on which the surface is to be placed. This could be
         the game screen or any other surface.
 
-        position (tuple): A tuple of two values between 0 and 2, representing the relative position
-        on the target surface where the text should be placed. The values correspond to the horizontal
-        and vertical position respectively. For example, a position of (1, 1) will place the text dead
+        position (tuple): A tuple of two values between 0 and 1, representing the relative position
+        on the target surface where the surface should be placed. The values correspond to the horizontal
+        and vertical position respectively. For example, a position of (0.5, 0.5) will place the text dead
         center on the target surface.
 
 
         """
-        text_position = text.get_rect()
-        text_position.centerx = target.get_rect().centerx * position[0]
-        text_position.centery = target.get_rect().centery * position[1]
-        target.blit(text, text_position)
+        surface_position = surface.get_rect()
+        surface_position.centerx = target.get_rect().centerx * position[0]
+        surface_position.centery = target.get_rect().centery * position[1]
+        target.blit(surface, surface_position)
