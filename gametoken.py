@@ -4,7 +4,6 @@ class GameToken():
     def __init__(self, game, color):
         self.game = game
         self.color = color
-        self.column = 0
         
         # create a transparent surface for the token to be drawn upon
         self.sprite = self.game.make_transparent_surface((32, 32))
