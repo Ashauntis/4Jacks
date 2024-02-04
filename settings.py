@@ -4,7 +4,7 @@
 RESOLUTION = (640, 360)
 FPS = 60
 TITLE = "4Jacks"
-SCENE_LIST = ["GameBoard", "Title"]
+SCENE_LIST = ["GameBoard", "Title", "GameOver"]
 SCENE_START = "Title"
 SFX_LIST = []
 FONT = "PressStart2P.ttf"

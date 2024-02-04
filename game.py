@@ -4,6 +4,7 @@ import settings
 from scene import Scene
 from scenes.title import Title
 from scenes.gameboard import GameBoard
+from scenes.gameover import GameOver
 
 
 class Game:
@@ -15,6 +16,7 @@ class Game:
         self.__sfx = {}
         self.volume_music = 100
         self.volume_effects = 100
+        self.winner = None
 
         # initialize pygame
         pygame.init()

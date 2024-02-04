@@ -22,6 +22,11 @@ class GameBoard(Scene):
         print(self.board_map)
 
     def update(self):
+        # look for a winner so we can stop the game
+        self.check_winner()
+        if self.game.winner is not None:
+            self.game.scene_push = "GameOver"
+
         # drop a piece
         if pygame.K_SPACE in self.game.just_pressed:
             col = self.selected_column
@@ -62,6 +67,39 @@ class GameBoard(Scene):
         # modulo are turn and column so they wrap around
         self.selected_column = self.selected_column % 7
         self.current_turn = self.current_turn % 2
+
+    def check_winner(self):
+        player_1 = [0]
+        player_2 = [0]
+
+        # add up all game winning scores
+        for row in range(6):
+            for col in range(7):
+                if self.board_score[row][col] >= 4:
+                    if self.board_map[row][col] == self.colors[0]:
+                        player_1.append(self.board_score[row][col])
+                    else:
+                        player_2.append(self.board_score[row][col])
+
+        # sort player in descending order
+        player_1.sort(reverse=True)
+        player_2.sort(reverse=True)
+
+        # did anyone have enough points to win?
+        if player_1[0] >= 4 or player_2[0] >= 4:
+            # if so, who won?
+
+            # was there a tie?
+            if player_1[0] == player_2[0]:
+                self.game.winner = "T I E ! !"
+
+            # did player 1 win?
+            if player_1[0] > player_2[0]:
+                self.game.winner = "Player 1 Wins!"
+
+            # did player 2 win?
+            if player_1[0] < player_2[0]:
+                self.game.winner = "Player 2 Wins!"
 
     def score_board(self, board):
         rows, cols = (6, 7)
