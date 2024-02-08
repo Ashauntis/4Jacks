@@ -1,5 +1,6 @@
 import pygame
 from scene import Scene
+import random
 
 
 class GameBoard(Scene):
@@ -21,12 +22,13 @@ class GameBoard(Scene):
 
         print(self.board_map)
 
-    def update(self):
-        print(self.game.ai)
-        # look for a winner so we can stop the game
-        self.check_winner()
-        if self.game.winner is not None:
-            self.game.scene_push = "GameOver"
+    def update_player_turn(self):
+
+        # move the selected column
+        if pygame.K_LEFT in self.game.just_pressed:
+            self.selected_column -= 1
+        if pygame.K_RIGHT in self.game.just_pressed:
+            self.selected_column += 1
 
         # drop a piece
         if pygame.K_SPACE in self.game.just_pressed:
@@ -46,6 +48,7 @@ class GameBoard(Scene):
                     self.current_turn += 1
                     searching = False
 
+        # pop a piece
         if pygame.K_RETURN in self.game.just_pressed:
             col = self.selected_column
             row = 5
@@ -59,11 +62,73 @@ class GameBoard(Scene):
 
                 self.current_turn += 1
 
-        # move the selected column
-        if pygame.K_LEFT in self.game.just_pressed:
-            self.selected_column -= 1
-        if pygame.K_RIGHT in self.game.just_pressed:
-            self.selected_column += 1
+    def get_move_list(self, board, color):
+        # create a possible list of 14 moves available
+        # first 7 are drops and the second 7 are pops
+        move_list = []
+
+        for col in range(7):
+            # check the top of each column to see if a piece can be dropped
+            if board[0][col] == 0:
+                move_list.append("d" + str(col))
+
+            # check if we can pop a piece by checking the bottom of each column
+            # to see if the bottom piece matches the color provided
+            if board[5][col] == color:
+                move_list.append("p" + str(col))
+
+        return move_list
+
+
+    def update_ai_turn(self):
+
+        # generate the list of possible moves this turn
+        move_list = self.get_move_list(self.board_map, self.colors[self.current_turn])
+
+        # chose a random element from the move list
+        move = random.choice(move_list)
+
+        # if the move is a drop
+        if move[0] == "d":
+            col = int(move[1])
+            row = 5
+            searching = True
+
+            while searching:
+                if self.board_map[row][col] != 0:
+                    row -= 1
+                    if row < 0:
+                        searching = False
+                else:
+                    self.board_map[row][col] = self.colors[self.current_turn]
+                    searching = False
+
+        # if the move is a pop
+        if move[0] == "p":
+            col = int(move[1])
+            row = 5
+
+            while row > 0:
+                self.board_map[row][col] = self.board_map[row - 1][col]
+                row -= 1
+            self.board_map[0][col] = 0
+
+        self.board_score = self.score_board(self.board_map)
+        self.current_turn += 1
+
+                
+
+    def update(self):
+
+        self.check_winner()
+        if self.game.winner is not None:
+            self.game.scene_push = "GameOver"
+
+
+        if self.game.ai == self.current_turn:
+            self.update_ai_turn()
+        else:
+            self.update_player_turn()
 
         # modulo are turn and column so they wrap around
         self.selected_column = self.selected_column % 7

@@ -107,7 +107,13 @@ class Game:
 
         elif self.scene_pop is not None:
             if len(self.scene) > 1:
-                self.scene.pop()
+                # if scene pop was given an integer, pop that many scenes
+                # otherwise, pop only one scene
+                if isinstance(self.scene_pop, int):
+                    for _ in range(self.scene_pop):
+                        self.scene.pop()
+                else:
+                    self.scene.pop()
             else:
                 print("WARNING: Cannot pop last scene! Exiting!")
                 self.quit = True

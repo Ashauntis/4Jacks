@@ -18,9 +18,9 @@ class GameOver(Scene):
         self.game.blit_centered(text_start, self.background)
 
     def update(self):
-        if pygame.K_SPACE in self.game.just_pressed:
+        if pygame.K_SPACE in self.game.just_pressed or pygame.K_ESCAPE in self.game.just_pressed:
             self.game.winner = None
-            self.game.scene_replace = "GameBoard"
+            self.game.scene_pop = 2
 
     def draw(self):
         # draw the background to the screen

@@ -50,7 +50,7 @@ class Title(Scene):
                 if self.selected_ai_color == 2:
                     self.game.ai = random.choice([0, 1])
                 else:
-                    self.game.ai = self.game.selected_ai_color
+                    self.game.ai = self.selected_ai_color
                 self.game.scene_push = "GameBoard"
 
             # if the user selects the third option, change the AI color setting
