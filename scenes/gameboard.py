@@ -17,7 +17,7 @@ class GameBoard(Scene):
 
         rows, cols = (6, 7)
         self.board_map = [[0 for i in range(cols)] for j in range(rows)]
-        self.board_score = [[0 for i in range(cols)] for j in range(rows)]
+        self.board_score = self.score_board(self.board_map)
 
         self.selected_column = 0
 
@@ -163,6 +163,27 @@ class GameBoard(Scene):
             # did player 2 win?
             if player_1[0] < player_2[0]:
                 self.game.winner = 1
+
+    def drop_piece(self, col, color, board):
+        row = 5
+        searching = True
+
+        while searching:
+            if board[row][col] != 0:
+                row -= 1
+                if row < 0:
+                    searching = False
+            else:
+                board[row][col] = color
+                searching = False
+
+    def pop_piece(self, col, board):
+        row = 5
+
+        while row > 0:
+            board[row][col] = board[row - 1][col]
+            row -= 1
+        board[0][col] = 0
 
     def score_board(self, board):
         rows, cols = (6, 7)
