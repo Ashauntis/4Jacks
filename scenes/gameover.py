@@ -6,19 +6,32 @@ class GameOver(Scene):
     def __init__(self, game):
         super().__init__(game)
 
+        # colors for the game
+        self.colors = ["RED", "YELLOW"]
+
         # make a transparent background
         self.background = self.game.make_transparent_surface(self.screen.get_size())
 
         # create the text
-        text_title = self.game.make_text("Game Over!", (30, 30, 30), 32)
-        text_start = self.game.make_text(self.game.winner, (50, 50, 50), 24)
+        text_game_over = self.game.make_text("Game Over!", (0, 0, 0), 8 * 8)
+        if self.game.winner == 2:
+            text_winner = self.game.make_text("T I E !", (0, 0, 0), 8 * 8)
+        else:
+            text_winner = self.game.make_text(
+                self.colors[self.game.winner] + " WINS",
+                self.colors[self.game.winner],
+                8 * 3,
+            )
 
         # write the text to the background
-        self.game.blit_centered(text_title, self.background, (0.5, 0.2))
-        self.game.blit_centered(text_start, self.background)
+        self.game.blit_centered(text_game_over, self.background, (0.51, 0.5))
+        self.game.blit_centered(text_winner, self.background, (0.5, 0.15))
 
     def update(self):
-        if pygame.K_SPACE in self.game.just_pressed or pygame.K_ESCAPE in self.game.just_pressed:
+        if (
+            pygame.K_SPACE in self.game.just_pressed
+            or pygame.K_ESCAPE in self.game.just_pressed
+        ):
             self.game.winner = None
             self.game.scene_pop = 2
 

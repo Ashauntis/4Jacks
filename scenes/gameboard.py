@@ -1,6 +1,7 @@
 import pygame
 from scene import Scene
 import random
+import settings
 
 
 class GameBoard(Scene):
@@ -79,7 +80,6 @@ class GameBoard(Scene):
 
         return move_list
 
-
     def update_ai_turn(self):
 
         # generate the list of possible moves this turn
@@ -116,19 +116,16 @@ class GameBoard(Scene):
         self.board_score = self.score_board(self.board_map)
         self.current_turn += 1
 
-                
-
     def update(self):
 
         self.check_winner()
         if self.game.winner is not None:
             self.game.scene_push = "GameOver"
-
-
-        if self.game.ai == self.current_turn:
-            self.update_ai_turn()
         else:
-            self.update_player_turn()
+            if self.game.ai == self.current_turn:
+                self.update_ai_turn()
+            else:
+                self.update_player_turn()
 
         # modulo are turn and column so they wrap around
         self.selected_column = self.selected_column % 7
@@ -157,15 +154,15 @@ class GameBoard(Scene):
 
             # was there a tie?
             if player_1[0] == player_2[0]:
-                self.game.winner = "T I E ! !"
+                self.game.winner = 2
 
             # did player 1 win?
             if player_1[0] > player_2[0]:
-                self.game.winner = "Player 1 Wins!"
+                self.game.winner = 0
 
             # did player 2 win?
             if player_1[0] < player_2[0]:
-                self.game.winner = "Player 2 Wins!"
+                self.game.winner = 1
 
     def score_board(self, board):
         rows, cols = (6, 7)
@@ -297,25 +294,27 @@ class GameBoard(Scene):
                         self.board, self.key_color, (50 * col + 50, 40 * row + 40), 18
                     )
 
-        # draw the scores over each piece (for debugging)
-        for row in range(6):
-            for col in range(7):
-                if self.board_score[row][col] != 0:
-                    # make text of the score
-                    text = self.game.make_text(
-                        str(self.board_score[row][col]), (255, 255, 255), 16
-                    )
+        if settings.DEBUG:
+            for row in range(6):
+                for col in range(7):
+                    if self.board_score[row][col] != 0:
+                        # make text of the score
+                        text = self.game.make_text(
+                            str(self.board_score[row][col]), (255, 255, 255), 16
+                        )
 
-                    # overlay the score onto the board
-                    self.board.blit(text, (50 * col + 40, 40 * row + 35))
+                        # overlay the score onto the board
+                        self.board.blit(text, (50 * col + 40, 40 * row + 35))
 
         # overlay the game board onto the screen
         self.game.blit_centered(self.board, self.game.screen, (0.5, 0.56))
 
-        # draw a piece hovering over the selected column
-        pygame.draw.circle(
-            self.game.screen,
-            self.colors[self.current_turn],
-            (50 * self.selected_column + 170, 32),
-            18,
-        )
+        # draw a piece hovering over the selected column while active
+        if self.active:
+
+            pygame.draw.circle(
+                self.game.screen,
+                self.colors[self.current_turn],
+                (50 * self.selected_column + 170, 32),
+                18,
+            )
