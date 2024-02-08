@@ -22,6 +22,7 @@ class GameBoard(Scene):
         print(self.board_map)
 
     def update(self):
+        print(self.game.ai)
         # look for a winner so we can stop the game
         self.check_winner()
         if self.game.winner is not None:
