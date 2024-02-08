@@ -146,12 +146,12 @@ class Game:
     def make_transparent_surface(self, size):
         return pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
 
-    def blit_centered(self, surface, target, position=(0.5, 0.5)):
+    def blit_centered(self, source, target, position=(0.5, 0.5)):
         """
         This function places a given surface at a specified position on the target surface.
 
         Parameters:
-        Surface (pygame.Surface): The surface to be placed. This is a pygame Surface object, which can be
+        source (pygame.Surface): The source surface to be placed. This is a pygame Surface object, which can be
         created using pygame.font.Font.render() method.
 
         target (pygame.Surface): The target surface on which the surface is to be placed. This could be
@@ -164,10 +164,10 @@ class Game:
 
 
         """
-        surface_position = surface.get_rect()
-        surface_position.centerx = target.get_rect().centerx * position[0] * 2
-        surface_position.centery = target.get_rect().centery * position[1] * 2
-        target.blit(surface, surface_position)
+        source_position = source.get_rect()
+        source_position.centerx = target.get_rect().centerx * position[0] * 2
+        source_position.centery = target.get_rect().centery * position[1] * 2
+        target.blit(source, source_position)
 
     def play_sound(self, sound):
         # set the volume of the sound based on the settings
