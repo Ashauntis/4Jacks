@@ -8,3 +8,4 @@ SCENE_LIST = ["GameBoard", "Title", "GameOver"]
 SCENE_START = "Title"
 SFX_LIST = []
 FONT = "PressStart2P.ttf"
+DEBUG = False
