@@ -15,12 +15,12 @@ class GameOver(Scene):
         # create the text
         text_game_over = self.game.make_text("Game Over!", (0, 0, 0), 8 * 8)
         if self.game.winner == 2:
-            text_winner = self.game.make_text("T I E !", (0, 0, 0), 8 * 8)
+            text_winner = self.game.make_text("Draw!", (255, 165, 0), 8 * 6)
         else:
             text_winner = self.game.make_text(
                 self.colors[self.game.winner] + " WINS",
                 self.colors[self.game.winner],
-                8 * 3,
+                8 * 4,
             )
 
         # write the text to the background
