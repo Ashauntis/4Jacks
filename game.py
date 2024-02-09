@@ -89,6 +89,10 @@ class Game:
             self.scene_pop = True
             # self.quit = True
 
+        # check for F11 to toggle the debug setting
+        if pygame.K_F11 in self.just_pressed:
+            settings.DEBUG = not settings.DEBUG
+
     def load_asset(self, asset_path: str):
         return pygame.image.load("assets/" + asset_path).convert_alpha()
 
