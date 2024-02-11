@@ -116,21 +116,6 @@ class GameBoard(Scene):
         self.board_score = self.score_board(self.board_map)
         self.current_turn += 1
 
-    def update(self):
-
-        self.check_winner()
-        if self.game.winner is not None:
-            self.game.scene_push = "GameOver"
-        else:
-            if self.game.ai == self.current_turn:
-                self.update_ai_turn()
-            else:
-                self.update_player_turn()
-
-        # modulo are turn and column so they wrap around
-        self.selected_column = self.selected_column % 7
-        self.current_turn = self.current_turn % 2
-
     def check_winner(self):
         player_1 = [0]
         player_2 = [0]
@@ -295,6 +280,22 @@ class GameBoard(Scene):
                     streak_minus = False
 
         return score
+
+    def update(self):
+
+        self.check_winner()
+        if self.game.winner is not None:
+            self.game.scene_push = "GameOver"
+
+
+        if self.game.ai == self.current_turn:
+            self.update_ai_turn()
+        else:
+            self.update_player_turn()
+
+        # modulo are turn and column so they wrap around
+        self.selected_column = self.selected_column % 7
+        self.current_turn = self.current_turn % 2
 
     def draw(self):
         self.game.screen.fill((80, 80, 80))

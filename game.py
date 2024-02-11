@@ -2,9 +2,11 @@ import os
 import pygame
 import settings
 from scene import Scene
+from scenes.debug import Debug
 from scenes.title import Title
 from scenes.gameboard import GameBoard
 from scenes.gameover import GameOver
+from scenes.debug import Debug
 
 
 class Game:
@@ -34,6 +36,7 @@ class Game:
 
         # create a pygame clock to limit the game to 60 fps
         self.clock = pygame.time.Clock()
+        self.delta = self.clock.get_time()
 
         # create a stack for scenes to be updated and drawn
         # and add the title scene to the stack
@@ -47,6 +50,8 @@ class Game:
         self.scene_pop = None
 
     def run(self):
+        self.debug_scene = Debug(self)
+
         while not self.quit:
             # handle events and input
             self.get_events_and_input()
@@ -62,6 +67,11 @@ class Game:
             # draw all scenes in the stack from bottom to top
             for scene in self.scene:
                 scene.draw()
+
+            # draw the debug panel
+            if settings.DEBUG:
+                self.debug_scene.update()
+                self.debug_scene.draw()
 
             # update the display
             pygame.display.flip()
