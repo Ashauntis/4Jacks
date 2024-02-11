@@ -14,6 +14,8 @@ class GameBoard(Scene):
         self.board.fill((33, 33, 255))
         self.colors = ["RED", "YELLOW"]
         self.current_turn = 0
+        self.ai_delay_start = 0
+        self.ai_delay_total = 1
 
         rows, cols = (6, 7)
         self.board_map = [[0 for i in range(cols)] for j in range(rows)]
@@ -24,6 +26,8 @@ class GameBoard(Scene):
         print(self.board_map)
 
     def update_player_turn(self):
+
+        turn_change = self.current_turn
 
         # move the selected column
         if pygame.K_LEFT in self.game.just_pressed:
@@ -63,6 +67,10 @@ class GameBoard(Scene):
 
                 self.current_turn += 1
 
+        # check if the turn has changed
+        if turn_change != self.current_turn:
+            self.ai_delay_start = self.elapsed()
+
     def get_move_list(self, board, color):
         # create a possible list of 14 moves available
         # first 7 are drops and the second 7 are pops
@@ -81,7 +89,10 @@ class GameBoard(Scene):
         return move_list
 
     def update_ai_turn(self):
-
+        # if the ai delay has not been reached, do nothing
+        if self.elapsed() - self.ai_delay_start < self.ai_delay_total:
+            return
+        
         # generate the list of possible moves this turn
         move_list = self.get_move_list(self.board_map, self.colors[self.current_turn])
 

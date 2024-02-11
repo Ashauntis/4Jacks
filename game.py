@@ -36,7 +36,6 @@ class Game:
 
         # create a pygame clock to limit the game to 60 fps
         self.clock = pygame.time.Clock()
-        self.delta = self.clock.get_time()
 
         # create a stack for scenes to be updated and drawn
         # and add the title scene to the stack
