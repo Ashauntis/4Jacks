@@ -2,6 +2,7 @@ import pygame
 from scene import Scene
 import random
 import settings
+from copy import deepcopy
 
 
 class GameBoard(Scene):
@@ -15,7 +16,7 @@ class GameBoard(Scene):
         self.colors = ["RED", "YELLOW"]
         self.current_turn = 0
         self.ai_delay_start = 0
-        self.ai_delay_total = 1
+        self.ai_delay_total = 0.2
 
         rows, cols = (6, 7)
         self.board_map = [[0 for i in range(cols)] for j in range(rows)]
@@ -88,11 +89,7 @@ class GameBoard(Scene):
 
         return move_list
 
-    def update_ai_turn(self):
-        # if the ai delay has not been reached, do nothing
-        if self.elapsed() - self.ai_delay_start < self.ai_delay_total:
-            return
-
+    def ai_turn_easy(self):
         # generate the list of possible moves this turn
         move_list = self.get_move_list(self.board_map, self.colors[self.current_turn])
 
@@ -126,6 +123,156 @@ class GameBoard(Scene):
 
         self.board_score = self.score_board(self.board_map)
         self.current_turn += 1
+
+    def ai_turn_hard(self):
+        # generate the list of possible moves this turn
+        move_list = self.get_move_list(self.board_map, self.colors[self.current_turn])
+
+        # compute the minimax score for each move and record the best move
+        best_move = None
+        best_score = None
+
+        print("Current Turn: " + str(self.current_turn))
+        print("Move list: " + str(move_list))
+
+        for move in move_list:
+            new_board = deepcopy(self.board_map)
+            self.apply_move_to_board(move, new_board, self.colors[self.current_turn])
+            score = self.minimax(new_board, 4, self.current_turn == 1)
+            print("Move: " + move + " Score: " + str(score))
+
+            if best_move is None:
+                best_move = move
+                best_score = score
+
+            if self.current_turn == 0:
+                if score > best_score:
+                    best_move = move
+                    best_score = score
+            else:
+                if score < best_score:
+                    best_move = move
+                    best_score = score
+
+        # apply the best move to the board
+        self.apply_move_to_board(
+            best_move, self.board_map, self.colors[self.current_turn]
+        )
+        self.board_score = self.score_board(self.board_map)
+        self.current_turn += 1
+
+    def apply_move_to_board(self, move, board, color):
+        if move[0] == "d":
+            col = int(move[1])
+            row = 5
+            searching = True
+
+            while searching:
+                if board[row][col] != 0:
+                    row -= 1
+                    if row < 0:
+                        searching = False
+                else:
+                    board[row][col] = color
+                    searching = False
+
+        if move[0] == "p":
+            col = int(move[1])
+            row = 5
+
+            while row > 0:
+                board[row][col] = board[row - 1][col]
+                row -= 1
+            board[0][col] = 0
+
+    def minimax(self, board, depth, maximizingPlayer):
+
+        winner = self.board_winner(board)
+        if winner is not None:
+            if winner == "RED":
+                return 1000000000000 * (depth + 1)
+            else:
+                return -1000000000000 * (depth + 1)
+
+        if depth == 0:
+            return self.summarize_board(board)
+
+        if maximizingPlayer:
+            maxEval = float("-inf")
+            for move in self.get_move_list(board, "RED"):
+                temp_board = deepcopy(board)
+                self.apply_move_to_board(move, temp_board, "RED")
+                eval = self.minimax(temp_board, depth - 1, False)
+                maxEval = max(maxEval, eval)
+            return maxEval
+        else:
+            minEval = float("inf")
+            for move in self.get_move_list(board, "YELLOW"):
+                temp_board = deepcopy(board)
+                self.apply_move_to_board(move, temp_board, "YELLOW")
+                eval = self.minimax(temp_board, depth - 1, True)
+                minEval = min(minEval, eval)
+            return minEval
+
+    def update_ai_turn(self):
+        # if the ai delay has not been reached, do nothing
+        if self.elapsed() - self.ai_delay_start < self.ai_delay_total:
+            return
+
+        if settings.EASY:
+            self.ai_turn_easy()
+        else:
+            self.ai_turn_hard()
+
+    def board_winner(self, board):
+        # check for a horizontal win
+        for row in range(6):
+            for col in range(4):
+                if (
+                    board[row][col]
+                    == board[row][col + 1]
+                    == board[row][col + 2]
+                    == board[row][col + 3]
+                    != 0
+                ):
+                    return board[row][col]
+
+        # check for a vertical win
+        for row in range(3):
+            for col in range(7):
+                if (
+                    board[row][col]
+                    == board[row + 1][col]
+                    == board[row + 2][col]
+                    == board[row + 3][col]
+                    != 0
+                ):
+                    return board[row][col]
+
+        # check for a diagonal win
+        for row in range(3):
+            for col in range(4):
+                if (
+                    board[row][col]
+                    == board[row + 1][col + 1]
+                    == board[row + 2][col + 2]
+                    == board[row + 3][col + 3]
+                    != 0
+                ):
+                    return board[row][col]
+
+        for row in range(3):
+            for col in range(4):
+                if (
+                    board[row + 3][col]
+                    == board[row + 2][col + 1]
+                    == board[row + 1][col + 2]
+                    == board[row][col + 3]
+                    != 0
+                ):
+                    return board[row][col]
+
+        return None
 
     def check_winner(self):
         player_1 = [0]
@@ -197,12 +344,15 @@ class GameBoard(Scene):
     def summarize_board(self, board):
         rows, cols = (6, 7)
         total = 0
+
+        weights = [0, 1, 10, 100, 1000, 10000, 100000, 1000000]
+
         for row in range(rows):
             for col in range(cols):
                 if board[row][col] == "RED":
-                    total += self.score_position(row, col, board)
+                    total += weights[self.score_position(row, col, board)]
                 if board[row][col] == "YELLOW":
-                    total -= self.score_position(row, col, board)
+                    total -= weights[self.score_position(row, col, board)]
 
         return total
 
@@ -341,6 +491,8 @@ class GameBoard(Scene):
 
         if settings.DEBUG:
             self.game.debug_scene.data = []
+            self.game.debug_scene.data.append("Current Turn: " + str(self.current_turn))
+            self.game.debug_scene.data.append("AI Easy: " + str(settings.EASY))
             self.game.debug_scene.data.append(str(self.summarize_board(self.board_map)))
 
             for row in range(6):

@@ -9,3 +9,4 @@ SCENE_START = "Title"
 SFX_LIST = []
 FONT = "PressStart2P.ttf"
 DEBUG = False
+EASY = False
