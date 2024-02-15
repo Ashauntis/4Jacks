@@ -92,7 +92,7 @@ class GameBoard(Scene):
         # if the ai delay has not been reached, do nothing
         if self.elapsed() - self.ai_delay_start < self.ai_delay_total:
             return
-        
+
         # generate the list of possible moves this turn
         move_list = self.get_move_list(self.board_map, self.colors[self.current_turn])
 
@@ -192,6 +192,19 @@ class GameBoard(Scene):
                     scores[row][col] = self.score_position(row, col, board)
 
         return scores
+
+    # take in a board and return a summary of the board
+    def summarize_board(self, board):
+        rows, cols = (6, 7)
+        total = 0
+        for row in range(rows):
+            for col in range(cols):
+                if board[row][col] == "RED":
+                    total += self.score_position(row, col, board)
+                if board[row][col] == "YELLOW":
+                    total -= self.score_position(row, col, board)
+
+        return total
 
     def score_position(self, row, col, board):
         score = 0
@@ -298,7 +311,6 @@ class GameBoard(Scene):
         if self.game.winner is not None:
             self.game.scene_push = "GameOver"
 
-
         if self.game.ai == self.current_turn:
             self.update_ai_turn()
         else:
@@ -328,6 +340,9 @@ class GameBoard(Scene):
                     )
 
         if settings.DEBUG:
+            self.game.debug_scene.data = []
+            self.game.debug_scene.data.append(str(self.summarize_board(self.board_map)))
+
             for row in range(6):
                 for col in range(7):
                     if self.board_score[row][col] != 0:
